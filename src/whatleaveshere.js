@@ -1,10 +1,9 @@
 /**
- * WhatLeavesHere
- * https://meta.wikimedia.org/wiki/User:Krinkle/Tools/WhatLeavesHere
+ * WhatLeavesHere v0.3.1
+ * https://github.com/Krinkle/mw-gadget-whatleaveshere
  *
- * @revision 0.3.0 (2013-11-12)
  * @license http://krinkle.mit-license.org/
- * @author Timo Tijhof, 2010–2013
+ * @author Timo Tijhof, 2010–2014
  */
 /*global mw*/
 ( function ( $ ) {
