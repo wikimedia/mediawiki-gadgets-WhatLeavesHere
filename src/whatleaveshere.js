@@ -9,7 +9,7 @@
 ( function ( $ ) {
 	'use strict';
 
-	var	namespace, target, limit,
+	var	namespace, target, limit, msg, message,
 		initiated = false,
 		conf = mw.config.get([
 			'wgCanonicalNamespace',
@@ -36,15 +36,6 @@
 		}
 	}
 
-	// Get interface message
-	function krGetMsg( key ) {
-		if ( window.krMsgs[key] ) {
-			return window.krMsgs[key];
-		} else {
-			return $.ucFirst( key );
-		}
-	}
-
 	/**
 	 * Main application
 	 */
@@ -63,7 +54,7 @@
 		if ( conf.wgCanonicalNamespace === 'Special' &&  conf.wgTitle === 'WhatLeavesHere' ) {
 
 			// Initialise page
-			document.title = krGetMsg('whatleaveshere') + ' - ' +  conf.wgSiteName;
+			document.title = msg('title') + ' - ' +  conf.wgSiteName;
 
 			optionHtml = '';
 			$.each( conf.wgFormattedNamespaces, function ( nsId, nsName ) {
@@ -80,32 +71,30 @@
 			$('#bodyContent').html(
 	'<div id="contentSub"></div><form action="/wiki/Special:WhatLeavesHere" method="get">' +
 		'<fieldset>' +
-			'<legend>' + krGetMsg('whatleaveshere') + '</legend>' +
-			'<label for="mw-whatleaveshere-target">' + krGetMsg('page') + ':</label>&nbsp;<input name="target" size="40" value="" id="mw-whatleaveshere-target">' +
-			' <label for="namespace">' + krGetMsg('namespace') + ':</label>&nbsp;' +
+			'<legend>' + message('title').escaped() + '</legend>' +
+			'<label for="mw-whatleaveshere-target">' + message('label-page').escaped() + ':</label>&nbsp;<input name="target" size="40" value="" id="mw-whatleaveshere-target">' +
+			' <label for="namespace">' + message('label-namespace').escaped() + ':</label>&nbsp;' +
 			'<select id="mw-whatleaveshere-namespace" name="namespace" class="namespaceselector mw-namespace-selector">' +
 				'<option value="" selected="selected">all</option>' + optionHtml +
 			'</select>' +
-			' <!-- <label for="limit">' + krGetMsg('limit') + ':</label>&nbsp;' +
+			' <!-- <label for="limit">' + message('label-limit').escaped() + ':</label>&nbsp;' +
 			'<select id="mw-whatleaveshere-limit" name="limit" class="limitselector mw-limit-selector">' +
 				'<option value="20">20</option><option value="50" selected="selected">50</option><option value="100">100</option><option value="250">250</option><option value="500">500</option>' +
 			'</select> -->' +
-			' <input type="submit" value="' + krGetMsg('go') + '">' +
+			' <input type="submit" value="' + message('button-submit').escaped() + '">' +
 		'</fieldset>' +
 	'</form>'
 	);
 
 			if ( mw.util.getParamValue( 'target' ) === null ) {
-				$('#firstHeading').text( krGetMsg( 'whatleaveshere' ) );
+				$('#firstHeading').text( msg( 'title' ) );
 			} else {
 				// is htmlescaped already apparantly
-				target = mw.util.getParamValue('target').replace(/_/g, ' ').replace(/\+/g, ' ');
+				target = $.trim(mw.util.getParamValue('target').replace(/_/g, ' ').replace(/\+/g, ' '));
 				namespace = mw.util.getParamValue('namespace');
 				limit = mw.util.getParamValue('limit');
 
-				$('#firstHeading').text(
-					krGetMsg('whatleaveshere-fromtitle').replace( '$1', '"' + $.trim( target + '"' ) )
-				);
+				$('#firstHeading').text(msg('title-leaveshere', target));
 				$('#contentSub').prepend('&larr; <a href="' + mw.util.wikiScript() + '?title=' +
 					mw.html.escape(encodeURIComponent(target)) + '&amp;redirect=no" title="' +
 					mw.html.escape(target) + '">' + mw.html.escape(target)  + '</a>'
@@ -163,14 +152,14 @@
 					});
 
 					if ( $data.length  ) {
-						$('#bodyContent').append('<p>' + krGetMsg('whatleaveshere-fromtext').replace('$1', '<b><a href="' + mw.html.escape(mw.util.getUrl(target)) + '"' + page_is_new + '>' + target + '</a></b>') + '</p><hr /><div class="toccolours toc" style="top:20em;right:1em;position:fixed"><h2>Contents</h2><ul><li><a href="#top">Links</a></li><li><a href="#mw-whatleaveshere-head-external">External links</a></li><li><a href="#mw-whatleaveshere-head-cats">Categories</a></li></ul></div><ul id="mw-whatleaveshere-list-link"></ul><h3 id="mw-whatleaveshere-head-external">External links</h3><ul id="mw-whatleaveshere-list-external"></ul><h3 id="mw-whatleaveshere-head-cats">Categories</h3><ul id="mw-whatleaveshere-list-cats"></ul>');
+						$('#bodyContent').append('<p>' + message('sub-leaveshere').escaped().replace('$1', '<b><a href="' + mw.html.escape(mw.util.getUrl(target)) + '"' + page_is_new + '>' + target + '</a></b>') + '</p><hr /><div class="toccolours toc" style="top:20em;right:1em;position:fixed"><h2>Contents</h2><ul><li><a href="#top">Links</a></li><li><a href="#mw-whatleaveshere-head-external">External links</a></li><li><a href="#mw-whatleaveshere-head-cats">Categories</a></li></ul></div><ul id="mw-whatleaveshere-list-link"></ul><h3 id="mw-whatleaveshere-head-external">External links</h3><ul id="mw-whatleaveshere-list-external"></ul><h3 id="mw-whatleaveshere-head-cats">Categories</h3><ul id="mw-whatleaveshere-list-cats"></ul>');
 						$list_link = $('#mw-whatleaveshere-list-link');
 						$list_external = $('#mw-whatleaveshere-list-external');
 						$list_cats = $('#mw-whatleaveshere-list-cats');
 						$data.each(function () {
 							if ( $(this).is('el') ) {
 								title = $(this).text();
-								var extlinksearch = '(<a href="' + mw.util.getUrl('Special:LinkSearch') + '?target=' + mw.html.escape(mw.util.wikiUrlencode(title)) + '">&larr; ' +  krGetMsg('linksearch').toLowerCase() + '</a>)';
+								var extlinksearch = '(<a href="' + mw.util.getUrl('Special:LinkSearch') + '?target=' + mw.html.escape(mw.util.wikiUrlencode(title)) + '">&larr; ' +  message('linksearch').escaped() + '</a>)';
 								$list_external.append('<li><a class="external" href="' + mw.html.escape(title) + '">' + mw.html.escape(title) + '</a> ' + extlinksearch + '</li>');
 							} else if ( $(this).is('cl') ) {
 								title = $(this).attr('title');
@@ -181,9 +170,9 @@
 								title = $(this).attr('title');
 								leavelink = '(<a href="' + mw.util.getUrl('Special:WhatLeavesHere') + '?target=' + mw.html.escape(mw.util.wikiUrlencode(title)) + '">&larr; leaves</a>)';
 								if ( $(this).is('tl') ) {
-									suffix = ' (' + krGetMsg('transclusion') + ') ' + leavelink;
+									suffix = ' (' + message('istemplate').escaped() + ') ' + leavelink;
 								} else if ( $(this).is('im') ) {
-									suffix = ' (' + krGetMsg('imagelink') + ') ' + leavelink;
+									suffix = ' (' + message('isfile').escaped() + ') ' + leavelink;
 								} else { // is <pl>
 									suffix = ' ' + leavelink;
 								}
@@ -191,7 +180,7 @@
 							}
 						});
 					} else {
-						$('#bodyContent').append('<p>' + krGetMsg('whatleaveshere-noresults').replace('$1', '<b><a href="' + mw.html.escape(mw.util.getUrl(target)) + '"' + page_is_new + '>' + target + '</a></b>') + '</p>');
+						$('#bodyContent').append('<p>' + message('noleaveshere').escaped().replace('$1', '<b><a href="' + mw.html.escape(mw.util.getUrl(target)) + '"' + page_is_new + '>' + target + '</a></b>') + '</p>');
 					}
 				});
 			}
@@ -200,33 +189,35 @@
 			mw.util.addPortletLink(
 				'p-tb',
 				mw.util.getUrl('Special:WhatLeavesHere') + '?target=' +  conf.wgPageName,
-				krGetMsg('whatleaveshere'),
+				msg('link-whatleaveshere'),
 				't-whatleaveshere',
-				krGetMsg('whatleaveshere-tooltip'),
+				msg('tooltip-whatleaveshere'),
 				false,
 				'#t-whatlinkshere'
 			);
 		} else if ( conf.wgCanonicalSpecialPageName === 'Whatlinkshere' ) {
 			$('#bodyContent form fieldset legend')
 				.append(' / <a href="' + mw.util.getUrl('Special:WhatLeavesHere') + '?target=' +
-					mw.util.wikiUrlencode($('#mw-whatlinkshere-target').val()) + '">' + krGetMsg('whatleaveshere-linktext') + '</a>'
+					mw.util.wikiUrlencode($('#mw-whatlinkshere-target').val()) + '">' + message('whatlinkshere-whatleaveshere').escaped() + '</a>'
 				);
 		} else if ( conf.wgCanonicalSpecialPageName === 'Specialpages' ) {
 			$('#mw-specialpagesgroup-pagetools').next().find('td ul').eq(1)
-				.prepend('<li><a href="' + mw.util.getUrl('Special:WhatLeavesHere') + '">' + krGetMsg('whatleaveshere') + '</a></li>');
+				.prepend('<li><a href="' + mw.util.getUrl('Special:WhatLeavesHere') + '">' + message('title').escaped() + '</a></li>');
 		}
 	}
 
-	// Make sure messages are loaded and init the tool
-	if ( !window.krMsgs ) {
-		$.ajax({
-			url: '//toolserver.org/~krinkle/I18N/export.php?lang=' +  conf.wgUserLanguage,
-			type: 'GET',
-			dataType: 'script',
-			cache: true
-		}).done(init);
-	} else {
-		init();
+	if (!mw.libs.getIntuition) {
+		mw.libs.getIntuition = $.ajax({ url: '//tools.wmflabs.org/intuition/load.php?env=mw', dataType: 'script', cache: true });
 	}
+
+	mw.libs.getIntuition
+		.then(function () {
+			return mw.libs.intuition.load('whatleaveshere');
+		})
+		.then(function () {
+			msg = $.proxy(mw.libs.intuition.msg, null, 'whatleaveshere');
+			message = $.proxy(mw.libs.intuition.message, null, 'whatleaveshere');
+		})
+		.done(init);
 
 }( jQuery ) );
