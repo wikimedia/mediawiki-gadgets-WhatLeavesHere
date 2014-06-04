@@ -150,14 +150,14 @@ function init() {
 					// sort by title, not by fullpagename (minus namespace)
 					if ( a.getAttribute('ns') === null ) {
 						return 0;
-					} else if (a.getAttribute('ns') == '0') {
+					} else if (a.getAttribute('ns') === '0') {
 						aTitle = a.getAttribute('title');
 					} else {
 						aTitle = krExplode(':', a.getAttribute('title'), 2)[1];
 					}
 					if (b.getAttribute('ns') === null ) {
 						return 0;
-					} else if (b.getAttribute('ns') == '0') {
+					} else if (b.getAttribute('ns') === '0') {
 						bTitle = b.getAttribute('title');
 					} else {
 						bTitle = krExplode(':', b.getAttribute('title'), 2)[1];
@@ -170,7 +170,7 @@ function init() {
 					$list_link = $('#mw-whatleaveshere-list-link');
 					$list_external = $('#mw-whatleaveshere-list-external');
 					$list_cats = $('#mw-whatleaveshere-list-cats');
-					$data.each(function (i) {
+					$data.each(function () {
 						if ( $(this).is('el') ) {
 							title = $(this).text();
 							var extlinksearch = '(<a href="' + mw.util.getUrl('Special:LinkSearch') + '?target=' + mw.html.escape(mw.util.wikiUrlencode(title)) + '">&larr; ' +  krGetMsg('linksearch').toLowerCase() + '</a>)';
