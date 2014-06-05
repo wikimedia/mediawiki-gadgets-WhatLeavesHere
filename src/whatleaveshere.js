@@ -5,12 +5,11 @@
  * @license http://krinkle.mit-license.org/
  * @author Timo Tijhof, 2010–2014
  */
-/*global mw*/
+/*global mw */
 ( function ( $ ) {
 	'use strict';
 
-	var	namespace, target, limit, msg, message,
-		initiated = false,
+	var namespace, target, limit, msg, message, gmessage,
 		conf = mw.config.get([
 			'wgCanonicalNamespace',
 			'wgCanonicalSpecialPageName',
@@ -21,33 +20,17 @@
 			'wgUserLanguage'
 		]);
 
-	// Explode with limit
-	function krExplode( delimiter, string, limit ) {
-		var splitted, partA, partB;
-		if ( !limit ) {
-			return string.split( delimiter );
-		} else {
-			// support for limit argument
-			splitted = string.split( delimiter );
-			partA = splitted.splice( 0, limit - 1 );
-			partB = splitted.join( delimiter );
-			partA.push( partB );
-			return partA;
-		}
+	function wrapListItem(nodes) {
+		var li = document.createElement('li');
+		$(li).append(nodes);
+		return li;
 	}
 
 	/**
-	 * Main application
+	 * Initialisation
 	 */
 	function init() {
 		var optionHtml;
-
-		// Prevent loading twice
-		if ( initiated ) {
-			return;
-		}
-
-		initiated = true;
 
 		// Only initialise if we're on [[Special:WhatLeavesHere]]
 		// Can't use wgCanonicalSpecialPageName, since this is a non-existing special page
@@ -77,10 +60,10 @@
 			'<select id="mw-whatleaveshere-namespace" name="namespace" class="namespaceselector mw-namespace-selector">' +
 				'<option value="" selected="selected">all</option>' + optionHtml +
 			'</select>' +
-			' <!-- <label for="limit">' + message('label-limit').escaped() + ':</label>&nbsp;' +
-			'<select id="mw-whatleaveshere-limit" name="limit" class="limitselector mw-limit-selector">' +
-				'<option value="20">20</option><option value="50" selected="selected">50</option><option value="100">100</option><option value="250">250</option><option value="500">500</option>' +
-			'</select> -->' +
+			// ' label for="limit">' + message('label-limit').escaped() + ':</label>&nbsp;' +
+			// '<select id="mw-whatleaveshere-limit" name="limit" class="limitselector mw-limit-selector">' +
+			//	'<option value="20">20</option><option value="50" selected="selected">50</option><option value="100">100</option><option value="250">250</option><option value="500">500</option>' +
+			// '</select>' +
 			' <input type="submit" value="' + message('button-submit').escaped() + '">' +
 		'</fieldset>' +
 	'</form>'
@@ -91,96 +74,184 @@
 			} else {
 				// is htmlescaped already apparantly
 				target = $.trim(mw.util.getParamValue('target').replace(/_/g, ' ').replace(/\+/g, ' '));
-				namespace = mw.util.getParamValue('namespace');
-				limit = mw.util.getParamValue('limit');
+				namespace = mw.util.getParamValue('namespace') || null;
+				limit = mw.util.getParamValue('limit') || null;
 
 				$('#firstHeading').text(msg('title-leaveshere', target));
 				$('#contentSub').prepend('&larr; <a href="' + mw.util.wikiScript() + '?title=' +
 					mw.html.escape(encodeURIComponent(target)) + '&amp;redirect=no" title="' +
 					mw.html.escape(target) + '">' + mw.html.escape(target)  + '</a>'
 				);
-				$('#mw-whatleaveshere-target').val( $.trim( target ) );
+				$('#mw-whatleaveshere-target').val(target);
 
 				if ( namespace ) {
-					$('#mw-whatleaveshere-namespace').val( String( namespace ) );
-					namespace = '&tlnamespace=' + namespace + '&plnamespace=' + namespace;
-				} else {
-					namespace = '';
+					$('#mw-whatleaveshere-namespace').val(namespace);
 				}
+
 				if ( limit ) {
-					$('#mw-whatleaveshere-limit').val( String( limit ) );
+					$('#mw-whatleaveshere-limit').val(limit);
 				}
 
 				$.ajax({
 					type: 'GET',
 					url: mw.util.wikiScript( 'api' ),
-					data: 'format=xml&action=query&titles=' + target + '&prop=templates|categories|extlinks|images|links' + namespace + '&tllimit=500&cllimit=500&ellimit=500&imlimit=500&pllimit=500',
-					timeout: 1000,
-					dataType: 'xml'
+					data: {
+						format: 'json',
+						action: 'query',
+						titles: target,
+						prop: 'templates|images|links|extlinks|categories',
+						tlnamespace: namespace,
+						plnamespace: namespace,
+						tllimit: 500,
+						imlimit: 500,
+						pllimit: 500,
+						ellimit: 500,
+						cllimit: 500
+					},
+					dataType: 'json'
 				}).done( function ( data ) {
-					var	aTitle, bTitle, $data_page, page_is_new, $data,
-						title, suffix, leavelink, $list_link, $list_external, $list_cats;
+					var	key, page, isNew, redLinkAttr,
+						$listLink, $listExternal, $listCats,
+						links = [],
+						extlinks = [],
+						catlinks = [],
+						hasResults = false;
 
-					// Dril down to the info of this page, then to all groups (*: categories, images, links etc.)
-					$data_page = $(data).find( 'pages > page[title="' + target + '"]' );
-					page_is_new = $data_page.is( '[missing=""]' );
-					if ( page_is_new ) {
-						$('#contentSub > a').eq(0).addClass( 'new' );
-						page_is_new = $data_page.is( '[missing=""]' ) ? ' class="new"' : '';
+					if ( !data || data.error || !data.query.pages ) {
+						return;
 					}
-					// Get all the children then sort them
-					$data = $data_page.find(' > *').children().sort(function (a, b) {
-						// sort by fullpagename
-						//return a.title > b.title ? 1 : -1;
 
-						// sort by title, not by fullpagename (minus namespace)
-						if ( a.getAttribute('ns') === null ) {
-							return 0;
-						} else if (a.getAttribute('ns') === '0') {
-							aTitle = a.getAttribute('title');
-						} else {
-							aTitle = krExplode(':', a.getAttribute('title'), 2)[1];
-						}
-						if (b.getAttribute('ns') === null ) {
-							return 0;
-						} else if (b.getAttribute('ns') === '0') {
-							bTitle = b.getAttribute('title');
-						} else {
-							bTitle = krExplode(':', b.getAttribute('title'), 2)[1];
-						}
-						return aTitle > bTitle ? 1 : -1;
-					});
+					for ( key in data.query.pages ) {
+						page = data.query.pages[ key ];
+						break;
+					}
 
-					if ( $data.length  ) {
-						$('#bodyContent').append('<p>' + message('sub-leaveshere').escaped().replace('$1', '<b><a href="' + mw.html.escape(mw.util.getUrl(target)) + '"' + page_is_new + '>' + target + '</a></b>') + '</p><hr /><div class="toccolours toc" style="top:20em;right:1em;position:fixed"><h2>Contents</h2><ul><li><a href="#top">Links</a></li><li><a href="#mw-whatleaveshere-head-external">External links</a></li><li><a href="#mw-whatleaveshere-head-cats">Categories</a></li></ul></div><ul id="mw-whatleaveshere-list-link"></ul><h3 id="mw-whatleaveshere-head-external">External links</h3><ul id="mw-whatleaveshere-list-external"></ul><h3 id="mw-whatleaveshere-head-cats">Categories</h3><ul id="mw-whatleaveshere-list-cats"></ul>');
-						$list_link = $('#mw-whatleaveshere-list-link');
-						$list_external = $('#mw-whatleaveshere-list-external');
-						$list_cats = $('#mw-whatleaveshere-list-cats');
-						$data.each(function () {
-							if ( $(this).is('el') ) {
-								title = $(this).text();
-								var extlinksearch = '(<a href="' + mw.util.getUrl('Special:LinkSearch') + '?target=' + mw.html.escape(mw.util.wikiUrlencode(title)) + '">&larr; ' +  message('linksearch').escaped() + '</a>)';
-								$list_external.append('<li><a class="external" href="' + mw.html.escape(title) + '">' + mw.html.escape(title) + '</a> ' + extlinksearch + '</li>');
-							} else if ( $(this).is('cl') ) {
-								title = $(this).attr('title');
-								leavelink = '(<a href="' + mw.util.getUrl('Special:WhatLeavesHere') + '?target=' + mw.html.escape(mw.util.wikiUrlencode(title)) + '">&larr; leaves</a>)';
-								$list_cats.append('<li><a href="' + mw.util.getUrl(title) + '">' + title + '</a> ' + leavelink + '</li>');
-								return true;
-							} else {
-								title = $(this).attr('title');
-								leavelink = '(<a href="' + mw.util.getUrl('Special:WhatLeavesHere') + '?target=' + mw.html.escape(mw.util.wikiUrlencode(title)) + '">&larr; leaves</a>)';
-								if ( $(this).is('tl') ) {
-									suffix = ' (' + message('istemplate').escaped() + ') ' + leavelink;
-								} else if ( $(this).is('im') ) {
-									suffix = ' (' + message('isfile').escaped() + ') ' + leavelink;
-								} else { // is <pl>
-									suffix = ' ' + leavelink;
-								}
-								$list_link.append('<li><a href="' + mw.util.getUrl(title) + '">' + title + '</a>' + suffix + '</li>');
-							}
-						});
+					if ( !page ) {
+						return;
+					}
+
+					// Back-compat
+					page.pagelinks = page.links;
+
+					isNew = page.missing !== undefined;
+					if ( isNew ) {
+						$('#contentSub > a').eq(0).addClass( 'new' );
+						redLinkAttr = ' class="new"';
 					} else {
-						$('#bodyContent').append('<p>' + message('noleaveshere').escaped().replace('$1', '<b><a href="' + mw.html.escape(mw.util.getUrl(target)) + '"' + page_is_new + '>' + target + '</a></b>') + '</p>');
+						redLinkAttr = '';
+					}
+
+					function handleLinks( type, i, link ) {
+						var typeText;
+						if ( type === 'template' ) {
+							typeText = gmessage('parentheses', message('istemplate').text()).text();
+						} else if ( type === 'file' ) {
+							typeText = gmessage('parentheses', message('isfile').text()).text();
+						} else {
+							typeText = '';
+						}
+
+						links.push([
+							$('<a>')
+								.attr('href', mw.util.getUrl(link.title))
+								.text(link.title)
+								.get(0),
+							' ' + typeText + ' ',
+							$('<a>')
+								.attr('href', mw.util.getUrl('Special:WhatLeavesHere', {
+									target: link.title
+								}))
+								.text('← leaves')
+								.get(0)
+						]);
+					}
+
+					if ( page.templates ) {
+						hasResults = true;
+						$.each( page.templates, $.proxy(handleLinks, null, 'template') );
+					}
+
+					if ( page.images ) {
+						hasResults = true;
+						$.each( page.images, $.proxy(handleLinks, null, 'file') );
+					}
+
+					if ( page.pagelinks ) {
+						hasResults = true;
+						$.each( page.pagelinks, $.proxy(handleLinks, null, 'pagelink') );
+					}
+
+					if ( page.extlinks ) {
+						hasResults = true;
+						$.each( page.extlinks, function ( i, link ) {
+							extlinks.push([
+								$('<a>')
+									.addClass('external')
+									.attr('href', link['*'])
+									.text(link['*'])
+									.get(0),
+								' ',
+								$('<a>')
+									.attr('href', mw.util.getUrl('Special:LinkSearch', {
+										target: link['*']
+									}))
+									.text('← ' + msg('linksearch'))
+									.get(0)
+							]);
+						} );
+					}
+
+					if ( page.categories ) {
+						hasResults = true;
+						$.each( page.categories, function ( i, link ) {
+							catlinks.push([
+								$('<a>')
+									.attr('href', mw.util.getUrl(link['*']))
+									.text(link['*'])
+									.get(0),
+								' ',
+								$('<a>')
+									.attr('href', mw.util.getUrl('Special:WhatLeavesHere', {
+										target: link['*']
+									}))
+									.text('← leaves')
+									.get(0)
+							]);
+						} );
+					}
+
+					if ( !hasResults ) {
+						$('#bodyContent').append('<p>' +
+							message('noleaveshere').escaped()
+								.replace('$1',
+									'<b><a href="' + mw.html.escape(mw.util.getUrl(target)) + '"' + redLinkAttr + '>' + mw.html.escape(target) + '</a></b>'
+								) +
+							'</p>'
+						);
+					} else {
+						$('#bodyContent').append('<p>' +
+							message('sub-leaveshere').escaped()
+								.replace('$1',
+									'<b><a href="' + mw.html.escape(mw.util.getUrl(target)) + '"' + redLinkAttr + '>' + mw.html.escape(target) + '</a></b>'
+								) +
+							'</p><hr>' +
+							'<div class="toccolours toc" style="top: 20em; right: 1em; position: fixed;">' +
+							'<h2>Contents</h2>' +
+								'<ul>' +
+								'<li><a href="#top">Links</a></li>' +
+								'<li><a href="#mw-whatleaveshere-extlinks">External links</a></li>' +
+								'<li><a href="#mw-whatleaveshere-catlinks">Categories</a></li>' +
+								'</ul>' +
+							'</div>' +
+							'<ul id="mw-whatleaveshere-links-list"></ul>' +
+							'<h3 id="mw-whatleaveshere-extlinks">External links</h3>' +
+							'<ul id="mw-whatleaveshere-extlinks-list"></ul>' +
+							'<h3 id="mw-whatleaveshere-catlinks">Categories</h3>' +
+							'<ul id="mw-whatleaveshere-catlinks-list"></ul>'
+						);
+						$listLink = $('#mw-whatleaveshere-links-list').append($.map(links, wrapListItem));
+						$listExternal = $('#mw-whatleaveshere-extlinks-list').append($.map(extlinks, wrapListItem));
+						$listCats = $('#mw-whatleaveshere-catlinks-list').append($.map(catlinks, wrapListItem));
 					}
 				});
 			}
@@ -210,14 +281,20 @@
 		mw.libs.getIntuition = $.ajax({ url: '//tools.wmflabs.org/intuition/load.php?env=mw', dataType: 'script', cache: true });
 	}
 
-	mw.libs.getIntuition
-		.then(function () {
-			return mw.libs.intuition.load('whatleaveshere');
-		})
-		.then(function () {
-			msg = $.proxy(mw.libs.intuition.msg, null, 'whatleaveshere');
-			message = $.proxy(mw.libs.intuition.message, null, 'whatleaveshere');
-		})
-		.done(init);
+	$.when(
+		mw.libs.getIntuition
+			.then(function () {
+				return mw.libs.intuition.load(['whatleaveshere', 'general']);
+			})
+			.then(function () {
+				msg = $.proxy(mw.libs.intuition.msg, null, 'whatleaveshere');
+				message = $.proxy(mw.libs.intuition.message, null, 'whatleaveshere');
+				gmessage = $.proxy(mw.libs.intuition.message, null, 'general');
+			}),
+		mw.loader.using([
+			'mediawiki.util'
+		]),
+		$.ready
+	).done(init);
 
 }( jQuery ) );
