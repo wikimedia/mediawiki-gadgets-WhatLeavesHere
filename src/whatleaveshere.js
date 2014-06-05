@@ -54,7 +54,7 @@
 			$('#bodyContent').html(
 	'<div id="contentSub"></div><form action="/wiki/Special:WhatLeavesHere" method="get">' +
 		'<fieldset>' +
-			'<legend>' + message('title').escaped() + '</legend>' +
+			'<legend id="mw-whatleaveshere-legend">' + message('title').escaped() + '</legend>' +
 			'<label for="mw-whatleaveshere-target">' + message('label-page').escaped() + ':</label>&nbsp;<input name="target" size="40" value="" id="mw-whatleaveshere-target">' +
 			' <label for="namespace">' + message('label-namespace').escaped() + ':</label>&nbsp;' +
 			'<select id="mw-whatleaveshere-namespace" name="namespace" class="namespaceselector mw-namespace-selector">' +
@@ -67,7 +67,17 @@
 			' <input type="submit" value="' + message('button-submit').escaped() + '">' +
 		'</fieldset>' +
 	'</form>'
-	);
+			).find('#mw-whatleaveshere-legend').append(
+				' / ',
+				$('<a>')
+					.attr('href', '#')
+					.text(msg('whatlinkshere'))
+					.on('click', function (e) {
+						e.preventDefault();
+						window.location.href = mw.util.getUrl('Special:WhatLinksHere') +
+							'?target=' + mw.util.wikiUrlencode($('#mw-whatleaveshere-target').val());
+					})
+			);
 
 			if ( mw.util.getParamValue( 'target' ) === null ) {
 				$('#firstHeading').text( msg( 'title' ) );
