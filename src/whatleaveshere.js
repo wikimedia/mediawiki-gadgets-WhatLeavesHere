@@ -4,6 +4,7 @@
  *
  * @license http://krinkle.mit-license.org/
  * @author Timo Tijhof, 2010–2014
+ * @track [[File:Krinkle_RTRC.js]]
  */
 /*global mw */
 ( function ( $ ) {
