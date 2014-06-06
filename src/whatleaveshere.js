@@ -110,20 +110,22 @@
 						format: 'json',
 						action: 'query',
 						titles: target,
-						prop: 'templates|images|links|extlinks|categories',
+						prop: 'templates|images|links|iwlinks|extlinks|categories',
 						tlnamespace: namespace,
 						plnamespace: namespace,
+						iwurl: '',
 						tllimit: 500,
 						imlimit: 500,
 						pllimit: 500,
+						iwlimit: 500,
 						ellimit: 500,
 						cllimit: 500
 					},
 					dataType: 'json'
 				}).done( function ( data ) {
 					var	key, page, isNew, redLinkAttr,
-						$listLink, $listExternal, $listCats,
 						links = [],
+						iwlinks = [],
 						extlinks = [],
 						catlinks = [],
 						hasResults = false;
@@ -192,6 +194,18 @@
 						$.each( page.pagelinks, $.proxy(handleLinks, null, 'pagelink') );
 					}
 
+					if ( page.iwlinks ) {
+						hasResults = true;
+						$.each( page.iwlinks, function ( i, link ) {
+							iwlinks.push([
+								$('<a>')
+									.attr('href', link.url)
+									.text(link.prefix + ':' + link['*'])
+									.get(0)
+							]);
+						} );
+					}
+
 					if ( page.extlinks ) {
 						hasResults = true;
 						$.each( page.extlinks, function ( i, link ) {
@@ -250,19 +264,23 @@
 							'<h2>Contents</h2>' +
 								'<ul>' +
 								'<li><a href="#top">Links</a></li>' +
+								'<li><a href="#mw-whatleaveshere-iwlinks">Interwiki links</a></li>' +
 								'<li><a href="#mw-whatleaveshere-extlinks">External links</a></li>' +
 								'<li><a href="#mw-whatleaveshere-catlinks">Categories</a></li>' +
 								'</ul>' +
 							'</div>' +
 							'<ul id="mw-whatleaveshere-links-list"></ul>' +
+							'<h3 id="mw-whatleaveshere-iwlinks">Interwiki links</h3>' +
+							'<ul id="mw-whatleaveshere-iwlinks-list"></ul>' +
 							'<h3 id="mw-whatleaveshere-extlinks">External links</h3>' +
 							'<ul id="mw-whatleaveshere-extlinks-list"></ul>' +
 							'<h3 id="mw-whatleaveshere-catlinks">Categories</h3>' +
 							'<ul id="mw-whatleaveshere-catlinks-list"></ul>'
 						);
-						$listLink = $('#mw-whatleaveshere-links-list').append($.map(links, wrapListItem));
-						$listExternal = $('#mw-whatleaveshere-extlinks-list').append($.map(extlinks, wrapListItem));
-						$listCats = $('#mw-whatleaveshere-catlinks-list').append($.map(catlinks, wrapListItem));
+						$('#mw-whatleaveshere-links-list').append($.map(links, wrapListItem));
+						$('#mw-whatleaveshere-iwlinks-list').append($.map(iwlinks, wrapListItem));
+						$('#mw-whatleaveshere-extlinks-list').append($.map(extlinks, wrapListItem));
+						$('#mw-whatleaveshere-catlinks-list').append($.map(catlinks, wrapListItem));
 					}
 				});
 			}
