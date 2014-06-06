@@ -217,13 +217,13 @@
 						$.each( page.categories, function ( i, link ) {
 							catlinks.push([
 								$('<a>')
-									.attr('href', mw.util.getUrl(link['*']))
-									.text(link['*'])
+									.attr('href', mw.util.getUrl(link.title))
+									.text(link.title)
 									.get(0),
 								' ',
 								$('<a>')
 									.attr('href', mw.util.getUrl('Special:WhatLeavesHere', {
-										target: link['*']
+										target: link.title
 									}))
 									.text('← leaves')
 									.get(0)
