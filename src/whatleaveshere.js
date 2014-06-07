@@ -80,6 +80,8 @@
 					})
 			);
 
+			mw.util.addCSS('.mw-whatleaveshere-toc { top: 20em; right: 1em; position: fixed; }');
+
 			if ( mw.util.getParamValue( 'target' ) === null ) {
 				$('#firstHeading').text( msg( 'title' ) );
 			} else {
@@ -127,7 +129,7 @@
 						links = [],
 						iwlinks = [],
 						extlinks = [],
-						catlinks = [],
+						categories = [],
 						hasResults = false;
 
 					if ( !data || data.error || !data.query.pages ) {
@@ -229,7 +231,7 @@
 					if ( page.categories ) {
 						hasResults = true;
 						$.each( page.categories, function ( i, link ) {
-							catlinks.push([
+							categories.push([
 								$('<a>')
 									.attr('href', mw.util.getUrl(link.title))
 									.text(link.title)
@@ -260,27 +262,27 @@
 									'<b><a href="' + mw.html.escape(mw.util.getUrl(target)) + '"' + redLinkAttr + '>' + mw.html.escape(target) + '</a></b>'
 								) +
 							'</p><hr>' +
-							'<div class="toccolours toc" style="top: 20em; right: 1em; position: fixed;">' +
+							'<div class="toccolours toc mw-whatleaveshere-toc">' +
 							'<h2>Contents</h2>' +
 								'<ul>' +
-								'<li><a href="#top">Links</a></li>' +
-								'<li><a href="#mw-whatleaveshere-iwlinks">Interwiki links</a></li>' +
-								'<li><a href="#mw-whatleaveshere-extlinks">External links</a></li>' +
-								'<li><a href="#mw-whatleaveshere-catlinks">Categories</a></li>' +
+								'<li><a href="#top">' + message('section-links').escaped() + '</a></li>' +
+								'<li><a href="#mw-whatleaveshere-iwlinks">' + message('section-iwlinks').escaped() + '</a></li>' +
+								'<li><a href="#mw-whatleaveshere-extlinks">' + message('section-extlinks').escaped() + '</a></li>' +
+								'<li><a href="#mw-whatleaveshere-categories">' + message('section-categories').escaped() + '</a></li>' +
 								'</ul>' +
 							'</div>' +
 							'<ul id="mw-whatleaveshere-links-list"></ul>' +
-							'<h3 id="mw-whatleaveshere-iwlinks">Interwiki links</h3>' +
+							'<h3 id="mw-whatleaveshere-iwlinks">' + message('section-iwlinks').escaped() + '</h3>' +
 							'<ul id="mw-whatleaveshere-iwlinks-list"></ul>' +
-							'<h3 id="mw-whatleaveshere-extlinks">External links</h3>' +
+							'<h3 id="mw-whatleaveshere-extlinks">' + message('section-extlinks').escaped() + '</h3>' +
 							'<ul id="mw-whatleaveshere-extlinks-list"></ul>' +
-							'<h3 id="mw-whatleaveshere-catlinks">Categories</h3>' +
-							'<ul id="mw-whatleaveshere-catlinks-list"></ul>'
+							'<h3 id="mw-whatleaveshere-categories">' + message('section-categories').escaped() + '</h3>' +
+							'<ul id="mw-whatleaveshere-categories-list"></ul>'
 						);
 						$('#mw-whatleaveshere-links-list').append($.map(links, wrapListItem));
 						$('#mw-whatleaveshere-iwlinks-list').append($.map(iwlinks, wrapListItem));
 						$('#mw-whatleaveshere-extlinks-list').append($.map(extlinks, wrapListItem));
-						$('#mw-whatleaveshere-catlinks-list').append($.map(catlinks, wrapListItem));
+						$('#mw-whatleaveshere-categories-list').append($.map(categories, wrapListItem));
 					}
 				});
 			}
