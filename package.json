@@ -1,6 +1,6 @@
 {
   "name": "mw-gadget-whatleaveshere",
-  "version": "0.3.2",
+  "version": "0.3.3",
   "description": "MediaWiki gadget to generate list of all outgoing links, categories and transclusions from a page (reverse of WhatLinksHere).",
   "keywords": [
     "mw-gadget"
@@ -14,7 +14,7 @@
   "licenses": [
     {
       "type": "MIT",
-      "url": "http://mit-license.org/"
+      "url": "http://krinkle.mit-license.org/"
     }
   ],
   "author": {

@@ -1,5 +1,5 @@
 /**
- * WhatLeavesHere v0.3.2
+ * WhatLeavesHere v0.3.3
  * https://github.com/Krinkle/mw-gadget-whatleaveshere
  *
  * @license http://krinkle.mit-license.org/
