@@ -7,7 +7,7 @@
  * @track [[File:Krinkle_RTRC.js]]
  */
 /*global mw */
-( function ( $ ) {
+(function ($) {
 	'use strict';
 
 	var namespace, target, limit, msg, message, gmessage,
@@ -35,14 +35,14 @@
 
 		// Only initialise if we're on [[Special:WhatLeavesHere]]
 		// Can't use wgCanonicalSpecialPageName, since this is a non-existing special page
-		if ( conf.wgCanonicalNamespace === 'Special' &&  conf.wgTitle === 'WhatLeavesHere' ) {
+		if (conf.wgCanonicalNamespace === 'Special' &&  conf.wgTitle === 'WhatLeavesHere') {
 
 			// Initialise page
 			document.title = msg('title') + ' - ' +  conf.wgSiteName;
 
 			optionHtml = '';
-			$.each( conf.wgFormattedNamespaces, function ( nsId, nsName ) {
-				if ( Number( nsId ) >= 0 ) {
+			$.each(conf.wgFormattedNamespaces, function (nsId, nsName) {
+				if (Number(nsId) >= 0) {
 					optionHtml += mw.html.element(
 						'option', {
 							value: nsId
@@ -50,7 +50,7 @@
 						nsId === '0' ? '(Main)' : nsName
 					);
 				}
-			} );
+			});
 
 			$('#bodyContent').html(
 	'<div id="contentSub"></div><form action="/wiki/Special:WhatLeavesHere" method="get">' +
@@ -75,15 +75,15 @@
 					.text(msg('whatlinkshere'))
 					.on('click', function (e) {
 						e.preventDefault();
-						window.location.href = mw.util.getUrl('Special:WhatLinksHere') +
+						location.href = mw.util.getUrl('Special:WhatLinksHere') +
 							'?target=' + mw.util.wikiUrlencode($('#mw-whatleaveshere-target').val());
 					})
 			);
 
 			mw.util.addCSS('.mw-whatleaveshere-toc { top: 20em; right: 1em; position: fixed; }');
 
-			if ( mw.util.getParamValue( 'target' ) === null ) {
-				$('#firstHeading').text( msg( 'title' ) );
+			if (mw.util.getParamValue('target') === null) {
+				$('#firstHeading').text(msg('title'));
 			} else {
 				// is htmlescaped already apparantly
 				target = $.trim(mw.util.getParamValue('target').replace(/_/g, ' ').replace(/\+/g, ' '));
@@ -97,17 +97,17 @@
 				);
 				$('#mw-whatleaveshere-target').val(target);
 
-				if ( namespace ) {
+				if (namespace) {
 					$('#mw-whatleaveshere-namespace').val(namespace);
 				}
 
-				if ( limit ) {
+				if (limit) {
 					$('#mw-whatleaveshere-limit').val(limit);
 				}
 
 				$.ajax({
 					type: 'GET',
-					url: mw.util.wikiScript( 'api' ),
+					url: mw.util.wikiScript('api'),
 					data: {
 						format: 'json',
 						action: 'query',
@@ -124,7 +124,7 @@
 						cllimit: 500
 					},
 					dataType: 'json'
-				}).done( function ( data ) {
+				}).done(function (data) {
 					var	key, page, isNew, redLinkAttr,
 						links = [],
 						iwlinks = [],
@@ -132,16 +132,16 @@
 						categories = [],
 						hasResults = false;
 
-					if ( !data || data.error || !data.query.pages ) {
+					if (!data || data.error || !data.query.pages) {
 						return;
 					}
 
-					for ( key in data.query.pages ) {
-						page = data.query.pages[ key ];
+					for (key in data.query.pages) {
+						page = data.query.pages[key];
 						break;
 					}
 
-					if ( !page ) {
+					if (!page) {
 						return;
 					}
 
@@ -149,18 +149,18 @@
 					page.pagelinks = page.links;
 
 					isNew = page.missing !== undefined;
-					if ( isNew ) {
-						$('#contentSub > a').eq(0).addClass( 'new' );
+					if (isNew) {
+						$('#contentSub > a').eq(0).addClass('new');
 						redLinkAttr = ' class="new"';
 					} else {
 						redLinkAttr = '';
 					}
 
-					function handleLinks( type, i, link ) {
+					function handleLinks(type, i, link) {
 						var typeText;
-						if ( type === 'template' ) {
+						if (type === 'template') {
 							typeText = gmessage('parentheses', message('istemplate').text()).text();
-						} else if ( type === 'file' ) {
+						} else if (type === 'file') {
 							typeText = gmessage('parentheses', message('isfile').text()).text();
 						} else {
 							typeText = '';
@@ -181,36 +181,36 @@
 						]);
 					}
 
-					if ( page.templates ) {
+					if (page.templates) {
 						hasResults = true;
-						$.each( page.templates, $.proxy(handleLinks, null, 'template') );
+						$.each(page.templates, $.proxy(handleLinks, null, 'template'));
 					}
 
-					if ( page.images ) {
+					if (page.images) {
 						hasResults = true;
-						$.each( page.images, $.proxy(handleLinks, null, 'file') );
+						$.each(page.images, $.proxy(handleLinks, null, 'file'));
 					}
 
-					if ( page.pagelinks ) {
+					if (page.pagelinks) {
 						hasResults = true;
-						$.each( page.pagelinks, $.proxy(handleLinks, null, 'pagelink') );
+						$.each(page.pagelinks, $.proxy(handleLinks, null, 'pagelink'));
 					}
 
-					if ( page.iwlinks ) {
+					if (page.iwlinks) {
 						hasResults = true;
-						$.each( page.iwlinks, function ( i, link ) {
+						$.each(page.iwlinks, function (i, link) {
 							iwlinks.push([
 								$('<a>')
 									.attr('href', link.url)
 									.text(link.prefix + ':' + link['*'])
 									.get(0)
 							]);
-						} );
+						});
 					}
 
-					if ( page.extlinks ) {
+					if (page.extlinks) {
 						hasResults = true;
-						$.each( page.extlinks, function ( i, link ) {
+						$.each(page.extlinks, function (i, link) {
 							extlinks.push([
 								$('<a>')
 									.addClass('external')
@@ -225,12 +225,12 @@
 									.text('← ' + msg('linksearch'))
 									.get(0)
 							]);
-						} );
+						});
 					}
 
-					if ( page.categories ) {
+					if (page.categories) {
 						hasResults = true;
-						$.each( page.categories, function ( i, link ) {
+						$.each(page.categories, function (i, link) {
 							categories.push([
 								$('<a>')
 									.attr('href', mw.util.getUrl(link.title))
@@ -244,10 +244,10 @@
 									.text('← leaves')
 									.get(0)
 							]);
-						} );
+						});
 					}
 
-					if ( !hasResults ) {
+					if (!hasResults) {
 						$('#bodyContent').append('<p>' +
 							message('noleaveshere').escaped()
 								.replace('$1',
@@ -287,7 +287,7 @@
 				});
 			}
 
-		} else if ( conf.wgCanonicalNamespace !== 'Special' ) {
+		} else if (conf.wgCanonicalNamespace !== 'Special') {
 			mw.util.addPortletLink(
 				'p-tb',
 				mw.util.getUrl('Special:WhatLeavesHere') + '?target=' +  conf.wgPageName,
@@ -297,12 +297,12 @@
 				false,
 				'#t-whatlinkshere'
 			);
-		} else if ( conf.wgCanonicalSpecialPageName === 'Whatlinkshere' ) {
+		} else if (conf.wgCanonicalSpecialPageName === 'Whatlinkshere') {
 			$('#bodyContent form fieldset legend')
 				.append(' / <a href="' + mw.util.getUrl('Special:WhatLeavesHere') + '?target=' +
 					mw.util.wikiUrlencode($('#mw-whatlinkshere-target').val()) + '">' + message('whatlinkshere-whatleaveshere').escaped() + '</a>'
 				);
-		} else if ( conf.wgCanonicalSpecialPageName === 'Specialpages' ) {
+		} else if (conf.wgCanonicalSpecialPageName === 'Specialpages') {
 			$('#mw-specialpagesgroup-pagetools').next().find('td ul').eq(1)
 				.prepend('<li><a href="' + mw.util.getUrl('Special:WhatLeavesHere') + '">' + message('title').escaped() + '</a></li>');
 		}
@@ -328,4 +328,4 @@
 		$.ready
 	).done(init);
 
-}( jQuery ) );
+}(jQuery));
