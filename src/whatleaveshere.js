@@ -309,7 +309,7 @@
 	}
 
 	if (!mw.libs.getIntuition) {
-		mw.libs.getIntuition = $.ajax({ url: '//tools.wmflabs.org/intuition/load.php?env=mw', dataType: 'script', cache: true });
+		mw.libs.getIntuition = $.ajax({ url: '//tools.wmflabs.org/intuition/load.php?env=mw', dataType: 'script', cache: true, timeout: 7000 });
 	}
 
 	$.when(
