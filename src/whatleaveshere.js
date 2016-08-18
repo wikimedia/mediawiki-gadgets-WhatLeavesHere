@@ -2,9 +2,8 @@
  * WhatLeavesHere v0.3.3
  * https://github.com/Krinkle/mw-gadget-whatleaveshere
  *
- * @license http://krinkle.mit-license.org/
- * @author Timo Tijhof, 2010–2014
- * @track [[File:Krinkle_RTRC.js]]
+ * @author Timo Tijhof
+ * @license https://krinkle.mit-license.org/@2016
  */
 /*global mw */
 (function ($) {

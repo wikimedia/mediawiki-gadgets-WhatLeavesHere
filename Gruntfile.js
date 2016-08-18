@@ -1,7 +1,6 @@
 /*jshint node:true */
 module.exports = function (grunt) {
 	grunt.loadNpmTasks('grunt-contrib-jshint');
-	grunt.loadNpmTasks('grunt-contrib-watch');
 	grunt.loadNpmTasks('grunt-jscs');
 
 	grunt.initConfig({
@@ -16,13 +15,6 @@ module.exports = function (grunt) {
 		},
 		jscs: {
 			all: '<%= jshint.all %>'
-		},
-		watch: {
-			files: [
-				'.{jscsrc,jshintrc,jshintignore}',
-				'<%= jshint.all %>'
-			],
-			tasks: 'test'
 		}
 	});
 
