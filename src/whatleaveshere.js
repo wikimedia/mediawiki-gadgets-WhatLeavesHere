@@ -58,7 +58,8 @@
 			'<label for="mw-whatleaveshere-target">' + message('label-page').escaped() + ':</label>&nbsp;<input name="target" size="40" value="" id="mw-whatleaveshere-target">' +
 			' <label for="namespace">' + message('label-namespace').escaped() + ':</label>&nbsp;' +
 			'<select id="mw-whatleaveshere-namespace" name="namespace" class="namespaceselector mw-namespace-selector">' +
-				'<option value="" selected="selected">all</option>' + optionHtml +
+				'<option value="" selected="selected">' + message('namespacesall').escaped() + '</option>' +
+				optionHtml +
 			'</select>' +
 			' <input type="submit" value="' + message('button-submit').escaped() + '">' +
 		'</fieldset>' +
