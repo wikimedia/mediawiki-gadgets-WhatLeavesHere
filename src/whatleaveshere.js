@@ -257,23 +257,35 @@
 							'<h2>Contents</h2>' +
 								'<ul>' +
 								'<li><a href="#top">' + message('section-links').escaped() + '</a></li>' +
-								'<li><a href="#mw-whatleaveshere-iwlinks">' + message('section-iwlinks').escaped() + '</a></li>' +
-								'<li><a href="#mw-whatleaveshere-extlinks">' + message('section-extlinks').escaped() + '</a></li>' +
-								'<li><a href="#mw-whatleaveshere-categories">' + message('section-categories').escaped() + '</a></li>' +
+								(iwlinks.length ? '<li>' + mw.html.element('a', { href: '#mw-whatleaveshere-iwlinks' }, msg('section-iwlinks')) + '</li>' : '') +
+								(extlinks.length ? '<li>' + mw.html.element('a', { href: '#mw-whatleaveshere-extlinks' }, msg('section-extlinks')) + '</li>' : '') +
+								(categories.length ? '<li>' + mw.html.element('a', { href: '#mw-whatleaveshere-categories' }, msg('section-categories')) + '</li>' : '') +
 								'</ul>' +
 							'</div>' +
 							'<ul id="mw-whatleaveshere-links-list"></ul>' +
-							'<h3 id="mw-whatleaveshere-iwlinks">' + message('section-iwlinks').escaped() + '</h3>' +
-							'<ul id="mw-whatleaveshere-iwlinks-list"></ul>' +
-							'<h3 id="mw-whatleaveshere-extlinks">' + message('section-extlinks').escaped() + '</h3>' +
-							'<ul id="mw-whatleaveshere-extlinks-list"></ul>' +
-							'<h3 id="mw-whatleaveshere-categories">' + message('section-categories').escaped() + '</h3>' +
-							'<ul id="mw-whatleaveshere-categories-list"></ul>'
+							'<div id="mw-whatleaveshere-iwlinks"></div>' +
+							'<div id="mw-whatleaveshere-extlinks"></div>' +
+							'<div id="mw-whatleaveshere-categories"></div>'
 						);
 						$('#mw-whatleaveshere-links-list').append($.map(links, wrapListItem));
-						$('#mw-whatleaveshere-iwlinks-list').append($.map(iwlinks, wrapListItem));
-						$('#mw-whatleaveshere-extlinks-list').append($.map(extlinks, wrapListItem));
-						$('#mw-whatleaveshere-categories-list').append($.map(categories, wrapListItem));
+						if (iwlinks.length) {
+							$('#mw-whatleaveshere-iwlinks').append(
+								mw.html.element('h3', {}, msg('section-iwlinks')),
+								$('<ul>').append($.map(iwlinks, wrapListItem))
+							);
+						}
+						if (extlinks.length) {
+							$('#mw-whatleaveshere-extlinks').append(
+								mw.html.element('h3', {}, msg('section-extlinks')),
+								$('<ul>').append($.map(extlinks, wrapListItem))
+							);
+						}
+						if (categories.length) {
+							$('#mw-whatleaveshere-categories').append(
+								mw.html.element('h3', {}, msg('section-categories')),
+								$('<ul>').append($.map(categories, wrapListItem))
+							);
+						}
 					}
 				});
 			}
