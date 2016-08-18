@@ -1,5 +1,5 @@
 /**
- * WhatLeavesHere v0.3.3
+ * WhatLeavesHere v0.4.0
  * https://github.com/Krinkle/mw-gadget-whatleaveshere
  *
  * @author Timo Tijhof
