@@ -9,7 +9,7 @@
 (function ($) {
 	'use strict';
 
-	var namespace, target, limit, msg, message, gmessage,
+	var namespace, target, msg, message, gmessage,
 		conf = mw.config.get([
 			'wgCanonicalNamespace',
 			'wgCanonicalSpecialPageName',
@@ -60,10 +60,6 @@
 			'<select id="mw-whatleaveshere-namespace" name="namespace" class="namespaceselector mw-namespace-selector">' +
 				'<option value="" selected="selected">all</option>' + optionHtml +
 			'</select>' +
-			// ' label for="limit">' + message('label-limit').escaped() + ':</label>&nbsp;' +
-			// '<select id="mw-whatleaveshere-limit" name="limit" class="limitselector mw-limit-selector">' +
-			//	'<option value="20">20</option><option value="50" selected="selected">50</option><option value="100">100</option><option value="250">250</option><option value="500">500</option>' +
-			// '</select>' +
 			' <input type="submit" value="' + message('button-submit').escaped() + '">' +
 		'</fieldset>' +
 	'</form>'
@@ -87,7 +83,6 @@
 				// is htmlescaped already apparantly
 				target = $.trim(mw.util.getParamValue('target').replace(/_/g, ' ').replace(/\+/g, ' '));
 				namespace = mw.util.getParamValue('namespace') || null;
-				limit = mw.util.getParamValue('limit') || null;
 
 				$('#firstHeading').text(msg('title-leaveshere', target));
 				$('#contentSub').prepend('&larr; <a href="' + mw.util.wikiScript() + '?title=' +
@@ -98,10 +93,6 @@
 
 				if (namespace) {
 					$('#mw-whatleaveshere-namespace').val(namespace);
-				}
-
-				if (limit) {
-					$('#mw-whatleaveshere-limit').val(limit);
 				}
 
 				$.ajax({
