@@ -106,7 +106,7 @@
 						prop: 'templates|images|links|iwlinks|extlinks|categories',
 						tlnamespace: namespace,
 						plnamespace: namespace,
-						iwurl: '',
+						iwprop: 'url',
 						tllimit: 500,
 						imlimit: 500,
 						pllimit: 500,
