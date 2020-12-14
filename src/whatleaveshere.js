@@ -316,7 +316,7 @@
   }
 
   if (!mw.libs.getIntuition) {
-    mw.libs.getIntuition = $.ajax({ url: '//tools.wmflabs.org/intuition/load.php?env=mw', dataType: 'script', cache: true, timeout: 7000 });
+    mw.libs.getIntuition = $.ajax({ url: 'https://intuition.toolforge.org/load.php?env=mw', dataType: 'script', cache: true, timeout: 7000 });
   }
 
   $.when(
@@ -325,9 +325,9 @@
         return mw.libs.intuition.load(['whatleaveshere', 'general']);
       })
       .then(function () {
-        msg = $.proxy(mw.libs.intuition.msg, null, 'whatleaveshere');
-        message = $.proxy(mw.libs.intuition.message, null, 'whatleaveshere');
-        gmessage = $.proxy(mw.libs.intuition.message, null, 'general');
+        msg = mw.libs.intuition.msg.bind(null, 'whatleaveshere');
+        message = mw.libs.intuition.message.bind(null, 'whatleaveshere');
+        gmessage = mw.libs.intuition.message.bind(null, 'general');
       }),
     mw.loader.using([
       'mediawiki.util'
