@@ -1,9 +1,9 @@
 /**
- * WhatLeavesHere v0.4.0
+ * WhatLeavesHere v0.5.0
  * https://github.com/Krinkle/mw-gadget-whatleaveshere
  *
  * @author Timo Tijhof
- * @license https://krinkle.mit-license.org
+ * @license https://krinkle.mit-license.org/@2017
  */
 /* eslint-env browser */
 /* global mw, $ */
@@ -316,7 +316,7 @@
   }
 
   if (!mw.libs.getIntuition) {
-    mw.libs.getIntuition = $.ajax({ url: 'https://intuition.toolforge.org/load.php?env=mw', dataType: 'script', cache: true, timeout: 7000 });
+    mw.libs.getIntuition = $.ajax({ url: 'https://meta.wikimedia.org/w/index.php?title=User:Krinkle/Scripts/Intuition.js&action=raw&ctype=text/javascript', dataType: 'script', cache: true, timeout: 7000 });
   }
 
   $.when(
