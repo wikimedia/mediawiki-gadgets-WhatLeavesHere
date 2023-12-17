@@ -4,6 +4,6 @@
     "test": "semistandard"
   },
   "devDependencies": {
-    "semistandard": "^15.0.0"
+    "semistandard": "^17.0.0"
   }
 }

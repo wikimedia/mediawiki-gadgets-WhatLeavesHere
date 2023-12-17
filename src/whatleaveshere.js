@@ -1,11 +1,12 @@
 /**
- * WhatLeavesHere v0.5.0
+ * WhatLeavesHere v0.5.1
  *
  * Copyright 2017 Timo Tijhof, https://gerrit.wikimedia.org/g/mediawiki/gadgets/WhatLeavesHere
  *
  * SPDX-License-Identifier: MIT
  */
 /* eslint-env browser */
+/* eslint no-var:off */
 /* global mw, $ */
 (function () {
   'use strict';
