@@ -1,9 +1,9 @@
 /**
  * WhatLeavesHere v0.5.0
- * https://github.com/Krinkle/mw-gadget-whatleaveshere
  *
- * @author Timo Tijhof
- * @license https://krinkle.mit-license.org/@2017
+ * Copyright 2017 Timo Tijhof, https://gerrit.wikimedia.org/g/mediawiki/gadgets/WhatLeavesHere
+ *
+ * SPDX-License-Identifier: MIT
  */
 /* eslint-env browser */
 /* global mw, $ */
@@ -119,7 +119,7 @@
             cllimit: 500
           },
           dataType: 'json'
-        }).done(function (data) {
+        }).then(function (data) {
           var key; var page; var isNew; var redLinkAttr;
           var links = [];
           var iwlinks = [];
@@ -333,5 +333,5 @@
       'mediawiki.util'
     ]),
     $.ready
-  ).done(init);
+  ).then(init);
 }());

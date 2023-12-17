@@ -1,20 +1,9 @@
 {
-  "name": "mw-gadget-whatleaveshere",
-  "version": "0.4.0",
-  "description": "MediaWiki gadget to display a list of all outgoing links, categories and transclusions from a page (the opposite of Special:WhatLinksHere).",
-  "keywords": [
-    "mw-gadget"
-  ],
-  "repository": {
-    "type": "git",
-    "url": "git://github.com/Krinkle/mw-gadget-whatleaveshere.git"
-  },
+  "private": true,
   "scripts": {
     "test": "semistandard"
   },
   "devDependencies": {
     "semistandard": "^15.0.0"
-  },
-  "author": "Timo Tijhof (https://github.com/Krinkle)",
-  "license": "MIT"
+  }
 }
