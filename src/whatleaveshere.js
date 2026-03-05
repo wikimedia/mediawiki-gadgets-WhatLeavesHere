@@ -1,7 +1,10 @@
 /**
- * WhatLeavesHere v0.5.1
+ * WhatLeavesHere
  *
- * Copyright 2017 Timo Tijhof, https://gerrit.wikimedia.org/g/mediawiki/gadgets/WhatLeavesHere
+ * Documentation: https://meta.wikimedia.org/wiki/User:Krinkle/Tools/WhatLeavesHere
+ * Source: https://gerrit.wikimedia.org/g/mediawiki/gadgets/WhatLeavesHere
+ *
+ * Copyright Timo Tijhof, https://gerrit.wikimedia.org/g/mediawiki/gadgets/WhatLeavesHere
  *
  * SPDX-License-Identifier: MIT
  */
