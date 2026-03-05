@@ -317,7 +317,7 @@
   }
 
   if (!mw.libs.getIntuition) {
-    mw.libs.getIntuition = $.ajax({ url: 'https://meta.wikimedia.org/w/index.php?title=User:Krinkle/Scripts/Intuition.js&action=raw&ctype=text/javascript', dataType: 'script', cache: true, timeout: 7000 });
+    mw.libs.getIntuition = $.ajax({ url: 'https://www.mediawiki.org/w/load.php?modules=ext.gadget.intuition&lang=en&only=scripts&raw=1', dataType: 'script', cache: true, timeout: 7000 });
   }
 
   $.when(
